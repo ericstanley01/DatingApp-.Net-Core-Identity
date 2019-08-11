@@ -4,7 +4,7 @@ export interface User {
   result: User;
   kn: string;
   id: number;
-  username: string;
+  userName: string;
   knownAs: string;
   age: string;
   gender: string;
@@ -18,4 +18,5 @@ export interface User {
   introduction?: string;
   lookingFor?: string;
   photos?: Photo[];
+  roles?: string[];
 }
