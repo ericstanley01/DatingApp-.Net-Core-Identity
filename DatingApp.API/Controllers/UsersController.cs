@@ -31,7 +31,7 @@ namespace DatingApp.API.Controllers
         public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var userFromRepo = await _repo.GetUser(currentUserId);
+            var userFromRepo = await _repo.GetUser(currentUserId, true);
             userParams.UserId = currentUserId;
 
             if (string.IsNullOrEmpty(userParams.Gender)) {
@@ -53,7 +53,9 @@ namespace DatingApp.API.Controllers
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _repo.GetUser(id);
+            var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
+
+            var user = await _repo.GetUser(id, isCurrentUser);
             var userToReturn = _mapper.Map<UserForDetailedDTO>(user);
 
             return Ok(userToReturn);
@@ -65,7 +67,7 @@ namespace DatingApp.API.Controllers
             if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)) 
                 return Unauthorized();
 
-            var userFromRepo = await _repo.GetUser(id);
+            var userFromRepo = await _repo.GetUser(id, true);
             
             _mapper.Map(userForUpdateDTO, userFromRepo);
 
@@ -82,12 +84,12 @@ namespace DatingApp.API.Controllers
                 return Unauthorized();
 
             var like = await _repo.GetLike(id, recipientId);
-            var recipientUser = await _repo.GetUser(recipientId);
+            var recipientUser = await _repo.GetUser(recipientId, false);
 
             if (like != null) 
                 return BadRequest("You already like " + recipientUser.KnownAs);
 
-            if (await _repo.GetUser(recipientId) == null) 
+            if (await _repo.GetUser(recipientId, false) == null) 
                 return NotFound();
 
             like = new Like {
@@ -109,7 +111,7 @@ namespace DatingApp.API.Controllers
             if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
-            if (await _repo.GetUser(recipientId) == null)
+            if (await _repo.GetUser(recipientId, false) == null)
                 return NotFound();
 
             var like = await _repo.GetLike(id, recipientId);
