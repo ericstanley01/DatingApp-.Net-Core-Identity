@@ -71,7 +71,13 @@ namespace DatingApp.API
                         ValidateAudience = false
                     };
                 });
-            
+
+            services.AddAuthorization(options => {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
+                options.AddPolicy("VIPOnly", policy => policy.RequireRole("VIP"));
+            });
+
             services.AddMvc(options =>
                 {
                     var policy = new AuthorizationPolicyBuilder()
@@ -80,7 +86,7 @@ namespace DatingApp.API
                     options.Filters.Add(new AuthorizeFilter(policy));
                 }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(opt => {
-                    opt.SerializerSettings.ReferenceLoopHandling = 
+                    opt.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
 
@@ -89,7 +95,7 @@ namespace DatingApp.API
             services.AddAutoMapper();
             services.AddTransient<Seed>();
             services.AddScoped<IDatingRepository, DatingRepository>();
-            
+
             services.AddScoped<LogUserActivity>();
         }
 
@@ -131,7 +137,7 @@ namespace DatingApp.API
                 options.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
                 options.AddPolicy("VIPOnly", policy => policy.RequireRole("VIP"));
             });
-            
+
             services.AddMvc(options => {
                     var policy = new AuthorizationPolicyBuilder()
                         .RequireAuthenticatedUser()
@@ -150,7 +156,7 @@ namespace DatingApp.API
             services.AddAutoMapper();
             services.AddTransient<Seed>();
             services.AddScoped<IDatingRepository, DatingRepository>();
-            
+
             services.AddScoped<LogUserActivity>();
         }
 
