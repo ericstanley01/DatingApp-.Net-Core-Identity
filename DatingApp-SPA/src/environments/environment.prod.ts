@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiDomain: 'localhost:5000',
-  apiUrl: 'http://localhost:5000/api/'
+  apiDomain: "datingapp-api-v2-01.herokuapp.com",
+  apiUrl: "https://datingapp-api-v2-01.herokuapp.com/api/",
 };
