@@ -1,0 +1,14 @@
+dotnet build
+dotnet run
+
+dotnet publish -c release -o app/ .
+
+docker build --pull -t datingapp-api-v2-01 .
+docker run -p 8181:80 datingapp-api-v2-01
+
+docker tag datingapp-api-v2-01 registry.heroku.com/datingapp-api-v2-01/web
+docker push registry.heroku.com/datingapp-api-v2-01/web
+heroku container:push web -a datingapp-api-v2-01
+heroku container:release web -a datingapp-api-v2-01
+
+https://datingapp-api-v2-01.herokuapp.com
