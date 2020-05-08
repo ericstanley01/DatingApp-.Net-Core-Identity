@@ -42,8 +42,12 @@ namespace DatingApp.API
 		{
 			services.AddDbContext<DataContext>(x =>
 			{
-				x.UseMySql(Configuration.GetConnectionString("ProdConnection"))
-				.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning));
+				x.UseMySql(Configuration.GetConnectionString("ProdConnection"),
+								options => options.EnableRetryOnFailure());
+				// x.UseMySql(Environment.GetEnvironmentVariable("PROD_CONNECTION"))
+				// .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning));
+				// x.UseMySql(Configuration.GetConnectionString("ProdConnection"))
+				// .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning));
 			});
 
 			IdentityBuilder builder = services.AddIdentityCore<User>(opt =>
@@ -82,16 +86,18 @@ namespace DatingApp.API
 
 			services.AddMvc(options =>
 							{
+								options.EnableEndpointRouting = false;
 								var policy = new AuthorizationPolicyBuilder()
 																					.RequireAuthenticatedUser()
 																					.Build();
 								options.Filters.Add(new AuthorizeFilter(policy));
-							}).SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-							.AddJsonOptions(opt =>
-							{
-								opt.SerializerSettings.ReferenceLoopHandling =
-																					Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 							});
+			// .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+			// 	.AddJsonOptions(opt =>
+			// 	{
+			// 		// opt.SerializerSettings.ReferenceLoopHandling =
+			// 		// 													Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+			// 	});
 
 			services.AddCors();
 			services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
@@ -107,6 +113,8 @@ namespace DatingApp.API
 			services.AddDbContext<DataContext>(x =>
 			{
 				x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+				// x.UseMySql(Configuration.GetConnectionString("ProdConnection"),
+				// 				options => options.EnableRetryOnFailure());
 			});
 
 			IdentityBuilder builder = services.AddIdentityCore<User>(opt =>
@@ -145,24 +153,24 @@ namespace DatingApp.API
 
 			services.AddMvc(options =>
 			{
+				options.EnableEndpointRouting = false;
 				var policy = new AuthorizationPolicyBuilder()
 								.RequireAuthenticatedUser()
 								.Build();
 				options.Filters.Add(new AuthorizeFilter(policy));
-			})
-							.SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-							.AddJsonOptions(opt =>
-							{
-								opt.SerializerSettings.ReferenceLoopHandling =
-																					Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-							});
+			});
+			// .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+			// .AddJsonOptions(opt =>
+			// {
+			// 	// opt.SerializerSettings.ReferenceLoopHandling =
+			// 	// 													Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+			// });
 			services.AddCors();
 			services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
 			Mapper.Reset();
 			services.AddAutoMapper();
 			services.AddTransient<Seed>();
 			services.AddScoped<IDatingRepository, DatingRepository>();
-
 			services.AddScoped<LogUserActivity>();
 		}
 
@@ -199,6 +207,7 @@ namespace DatingApp.API
 			app.UseAuthentication();
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
+
 			app.UseMvc(
 			// routes => {
 			// routes.MapSpaFallbackRoute(
