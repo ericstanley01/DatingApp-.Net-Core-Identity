@@ -4,3 +4,10 @@ obj
 .db
 .vs
 appsettings.json
+appsettings.Development.json
+DatingApp.db
+DatingApp.sql
+.DS_Store
+app/
+build-steps.txt
+.gitignore
